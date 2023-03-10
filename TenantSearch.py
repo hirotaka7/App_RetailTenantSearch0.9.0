@@ -38,7 +38,7 @@ if zip_RTS is not None:
     zf=zipfile.ZipFile(zip_RTS,'r')
     zf.setpassword(bytes(Key_RTS,'utf-8'))
     with zf as z:
-        with z.open('RTS/PropertyTenant.csv') as f:
+        with z.open('PropertyTenant.csv') as f:
             df_PT=pd.read_csv(f,encoding='utf-8',dtype=str)
     
     df_Tenant=df_PT.drop_duplicates(subset='Tenant')[['Tenant']].sort_values('Tenant').reset_index(drop=True)
