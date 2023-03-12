@@ -40,7 +40,7 @@ if zip_RTS is not None:
     with zf as z:
         with z.open('PropertyTenant.csv') as f:
             df_PT=pd.read_csv(f,encoding='utf-8',dtype=str)
-    
+    df_PT.Tsubo=df_PT.Tsubo.astype(float)
     df_Tenant=df_PT.drop_duplicates(subset='Tenant')[['Tenant']].sort_values('Tenant').reset_index(drop=True)
     
     
@@ -72,6 +72,11 @@ if zip_RTS is not None:
                 '大型量販店', 'ブライダル', 'アンテナショップ',  '医療', 'ファッション'
             ],
             default=[]
+        )
+        start_Size,end_Size=st.select_slider(
+            label='Size (Tsubo) | 賃貸面積 (坪) ',
+            options=[0,25,50,75,100,150,200,250,300,350,400,450,500,1000,2500,5000,10000],
+            value=(0,300)
         )
         start_BA,end_BA=st.select_slider(
             label='Building Age | 築年数 ',
@@ -113,6 +118,15 @@ if zip_RTS is not None:
             df_PT[['Tenant']].drop_duplicates().assign(Business='●'),
             how='outer'
         ).sort_values(['Business']).reset_index(drop=True)
+    df_PT=df_PT[
+        (df_PT.Tsubo>start_Size)&
+        (df_PT.Tsubo<=end_Size)
+    ].reset_index(drop=True)
+    df_Tenant=pd.merge(
+        df_Tenant,
+        df_PT[['Tenant']].drop_duplicates().assign(Size='●'),
+        how='outer'
+    ).sort_values(['Size']).reset_index(drop=True)
     df_PT=df_PT[df_PT.BldgAgeRange.isin(BARangeList)].reset_index(drop=True)
     df_Tenant=pd.merge(
         df_Tenant,
